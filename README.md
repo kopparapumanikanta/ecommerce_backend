@@ -80,4 +80,3 @@ Unit and web-slice tests need no external services. The full-context test runs o
 - JWT: stateless, signed, short-lived; roles in a claim; secrets come from env / Secrets Manager, never from code.
 - SQL: the sales report is a JPQL join + group by; `idx_orders_customer` speeds up "my orders".
 - Honest framing: a learning project that mirrors production patterns, not production experience.
-# ecommerce-frontend
