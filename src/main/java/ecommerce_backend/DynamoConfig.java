@@ -44,8 +44,12 @@ public class DynamoConfig {
     public DynamoDbTable<EventRecord> eventTable(
             DynamoDbEnhancedClient enhancedClient,
             DynamoDbClient client,
-            @Value("${dynamodb.table:event_records}") String tableName) {
+            @Value("${dynamodb.table:event_records}") String tableName,
+            @Value("${dynamodb.create-table:true}") boolean createTable) {
         DynamoDbTable<EventRecord> table = enhancedClient.table(tableName, TableSchema.fromBean(EventRecord.class));
+        if (!createTable) {
+            return table;
+        }
         ProvisionedThroughput throughput = ProvisionedThroughput.builder().readCapacityUnits(5L).writeCapacityUnits(5L).build();
         EnhancedGlobalSecondaryIndex entityIndex = EnhancedGlobalSecondaryIndex.builder()
                 .indexName(EventStore.ENTITY_INDEX)

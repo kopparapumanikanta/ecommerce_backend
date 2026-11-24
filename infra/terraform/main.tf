@@ -69,3 +69,53 @@ resource "aws_dynamodb_table" "event_records" {
 output "ecr_repository_url" {
   value = aws_ecr_repository.backend.repository_url
 }
+
+data "aws_iam_policy_document" "app_dynamodb" {
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "dynamodb:DescribeTable",
+    ]
+    resources = [
+      aws_dynamodb_table.event_records.arn,
+      "${aws_dynamodb_table.event_records.arn}/index/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "app_dynamodb" {
+  name   = "ecommerce-app-dynamodb"
+  policy = data.aws_iam_policy_document.app_dynamodb.json
+}
+
+resource "aws_iam_user" "app_local" {
+  name = "ecommerce-app-local"
+}
+
+resource "aws_iam_user_policy_attachment" "app_local_dynamodb" {
+  user       = aws_iam_user.app_local.name
+  policy_arn = aws_iam_policy.app_dynamodb.arn
+}
+
+data "aws_iam_policy_document" "ecs_tasks_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "app_task" {
+  name               = "ecommerce-app-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "app_task_dynamodb" {
+  role       = aws_iam_role.app_task.name
+  policy_arn = aws_iam_policy.app_dynamodb.arn
+}

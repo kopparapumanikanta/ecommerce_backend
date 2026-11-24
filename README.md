@@ -80,3 +80,7 @@ Unit and web-slice tests need no external services. The full-context test runs o
 - JWT: stateless, signed, short-lived; roles in a claim; secrets come from env / Secrets Manager, never from code.
 - SQL: the sales report is a JPQL join + group by; `idx_orders_customer` speeds up "my orders".
 - Honest framing: a learning project that mirrors production patterns, not production experience.
+
+## Deploy to AWS (EC2 + S3)
+
+Terraform (`infra/terraform`) creates a t3.medium EC2 instance with an Elastic IP, an IAM role (DynamoDB access + Session Manager), a security group that opens only port 8080, and a public S3 bucket for the React build. The server runs the same Docker Compose stack, using `docker-compose.ec2.yml`. Connect with Session Manager (no SSH keys). Remove everything with `terraform destroy`.

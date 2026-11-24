@@ -1,0 +1,16 @@
+services:
+  postgres:
+    restart: unless-stopped
+  redis:
+    restart: unless-stopped
+  dynamodb:
+    restart: unless-stopped
+  kafka:
+    restart: unless-stopped
+  app:
+    restart: unless-stopped
+    environment:
+      DYNAMODB_ENDPOINT: ""
+      DYNAMODB_CREATE_TABLE: "false"
+      AWS_REGION: us-east-1
+      CORS_ORIGINS: ${CORS_ORIGINS:?set CORS_ORIGINS in .env}
