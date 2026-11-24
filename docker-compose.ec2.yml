@@ -14,3 +14,10 @@ services:
       DYNAMODB_CREATE_TABLE: "false"
       AWS_REGION: us-east-1
       CORS_ORIGINS: ${CORS_ORIGINS:?set CORS_ORIGINS in .env}
+      SPRING_PROFILES_ACTIVE: json
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-group: /ecs/ecommerce-backend
+        awslogs-stream: app

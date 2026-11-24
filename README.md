@@ -84,3 +84,8 @@ Unit and web-slice tests need no external services. The full-context test runs o
 ## Deploy to AWS (EC2 + S3)
 
 Terraform (`infra/terraform`) creates a t3.medium EC2 instance with an Elastic IP, an IAM role (DynamoDB access + Session Manager), a security group that opens only port 8080, and a public S3 bucket for the React build. The server runs the same Docker Compose stack, using `docker-compose.ec2.yml`. Connect with Session Manager (no SSH keys). Remove everything with `terraform destroy`.
+
+## Secrets and monitoring on AWS
+
+- Secrets live in AWS Secrets Manager (`ecommerce/app`, one JSON secret). On the server, `scripts/fetch-secrets.sh` writes `.env` from it using the instance role, so no secret is stored in git or in Terraform.
+- The app container sends JSON logs (with the request id) to CloudWatch Logs (`/ecs/ecommerce-backend`). A metric filter counts `ERROR` lines, and an alarm emails you through SNS. A second alarm watches the EC2 status check.
